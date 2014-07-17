@@ -1,0 +1,5 @@
+xRayCalAnalysis
+===============
+
+Software to read the root files from pXar and fit a calibration curve from them.
+This software should allow also temperature studies.
