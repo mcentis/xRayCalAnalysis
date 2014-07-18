@@ -14,12 +14,7 @@
 
 TF1* fitPeak(TH1* hist, double negSig = 1, double posSig = 1)
 {
-  if(hist == 0)
-    {
-      TF1* ret = new TF1("ret", "gaus");
-      ret->SetParameters(0, 0, 0);
-      return ret;
-    }
+  if(hist == 0) return 0;
 
   int maxBin = hist->GetMaximumBin();
   double maxPos = hist->GetXaxis()->GetBinCenter(maxBin);
