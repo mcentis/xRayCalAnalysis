@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
       std::cout << "\tusage: testFit infile outfile" << std::endl;
       return 1;
     }
+
   gSystem->Load("libTree"); // to avoid warnings
 
   TFile* inFile = TFile::Open(argv[1]);
