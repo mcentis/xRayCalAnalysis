@@ -8,15 +8,24 @@
 
 #include "TH1.h"
 #include "TF1.h"
+#include "TAxis.h"
+#include "TCanvas.h"
 
 TF1* fitPeak(TH1* hist)
 {
+  if(hist == 0) return 0;
+
+  int maxBin = hist->GetMaximumBin();
+  double maxPos = hist->GetXaxis()->GetBinCenter(maxBin);
+
+  TCanvas* fitCan = new TCanvas("fitCan");
+
   TF1* fitFunc = new TF1("fitFunc", "gaus");
   fitFunc->SetParameter(0, hist->GetMaximum());
-  fitFunc->SetParameter(1, hist->GetMaximumX());
+  fitFunc->SetParameter(1, maxPos);
   fitFunc->SetParameter(2, hist->GetRMS());
-  double start = hist->GetMaximumX() - hist->GetRMS();
-  double stop = hist->GetMaximumX() + hist->GetRMS();
+  double start = maxPos - hist->GetRMS();
+  double stop = maxPos + hist->GetRMS();
   fitFunc->SetRange(start, stop);
   hist->Fit(fitFunc, "RQ");
 
@@ -24,6 +33,8 @@ TF1* fitPeak(TH1* hist)
   stop = fitFunc->GetParameter(1) + fitFunc->GetParameter(2);
   fitFunc->SetRange(start, stop);
   hist->Fit(fitFunc, "RQ");
+
+  delete fitCan;
 
   return fitFunc;
 }
