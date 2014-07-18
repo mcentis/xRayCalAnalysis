@@ -22,8 +22,8 @@ int main(int argc, char* argv[])
 
   TDirectory* dir = (TDirectory*) inFile->Get("Xray");
 
-  const int nHi = 3;
-  const char* hiNames[nHi] = {"q_Cu_C0_V0", "q_Mo_C0_V0", "q_Ag_C0_V0"};
+  const int nHi = 4;
+  const char* hiNames[nHi] = {"q_Cu_C0_V0", "q_Mo_C0_V0", "q_Ag_C0_V0", "notToBeFound"};
 
   TF1* fit;
 
@@ -31,12 +31,12 @@ int main(int argc, char* argv[])
     {
       TH1* hist = (TH1*) dir->Get(hiNames[i]);
       if(hist == 0)
-	{
-	  std::cout << "\thistogram " << hiNames[i] << "not found" << std::endl;
-	  continue;
-	}
+      	{
+      	  std::cout << "\thistogram " << hiNames[i] << " not found" << std::endl;
+      	  continue;
+      	}
 
-      fit = fitPeak(hist);
+      fit = fitPeak(hist, 1, 1.5);
       std::cout << hiNames[i] << " peak -> " << fit->GetParameter(1) << " +- " << fit->GetParError(1) << std::endl;
 
       hist->Write();
