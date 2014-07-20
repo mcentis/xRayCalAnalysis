@@ -101,19 +101,19 @@ int main(int argc, char* argv[])
       allTcal->Add(gr);
     }
 
+  outFile->cd();
+
   TCanvas* allCalCan = new TCanvas("allCalCan");
   allCalCan->SetGridx();
   allCalCan->SetGridy();
   allTcal->Draw("APL");
   allTcal->GetXaxis()->SetTitle("Measured ionization [Vcal]");
   allTcal->GetYaxis()->SetTitle("Teoretical charge deposit [e]");
+  allTcal->Write();
   TLegend* leg = allCalCan->BuildLegend();
   leg->SetFillColor(kWhite);
   allCalCan->Modified();
   allCalCan->Update();
-
-  outFile->cd();
-  allTcal->Write();
   allCalCan->Write();
 
   outFile->Close();
