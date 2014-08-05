@@ -14,6 +14,7 @@
 
 #include "iostream"
 #include "fstream"
+#include "math.h"
 
 int main(int argc, char* argv[])
 {
@@ -39,6 +40,11 @@ int main(int argc, char* argv[])
   peakCurr->SetName("peakCurr");
   sprintf(title, "%s line vs tube current", argv[1]);
   peakCurr->SetTitle(title);
+
+  TGraphErrors* entriesCurr = new TGraphErrors();
+  entriesCurr->SetName("entriesCurr");
+  entriesCurr->SetTitle("Number of entries vs tube current");
+
   int nPoint = 0;
 
   TDirectory* dir;
@@ -91,6 +97,9 @@ int main(int argc, char* argv[])
       peakCurr->SetPoint(nPoint, curr, fit->GetParameter(1));
       peakCurr->SetPointError(nPoint, 0, fit->GetParError(1));
 
+      entriesCurr->SetPoint(nPoint, curr, hist->GetEntries());
+      // entriesCurr->SetPointError(nPoint, 0, sqrt(hist->GetEntries()));
+
       sprintf(name, "%s_%.02fmA", argv[1], curr);
       hist->SetName(name);
 
@@ -110,6 +119,19 @@ int main(int argc, char* argv[])
   peakCurrCan->Modified();
   peakCurrCan->Update();
   peakCurrCan->Write();
+
+  TCanvas* entriesCurrCan = new TCanvas("entriesCurrCan");
+  entriesCurrCan->SetGridx();
+  entriesCurrCan->SetGridy();
+  entriesCurr->SetMarkerStyle(22);
+  entriesCurr->SetMarkerSize(2);
+  entriesCurr->Draw("AP");
+  entriesCurr->GetXaxis()->SetTitle("Tube current [mA]");
+  entriesCurr->GetYaxis()->SetTitle("Measured ionization [Vcal]");
+  entriesCurr->Write();
+  entriesCurrCan->Modified();
+  entriesCurrCan->Update();
+  entriesCurrCan->Write();
 
   outFile->Close();
 
