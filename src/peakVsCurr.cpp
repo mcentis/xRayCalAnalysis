@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
       entriesCurr->SetPoint(nPoint, curr, hist->GetEntries());
       // entriesCurr->SetPointError(nPoint, 0, sqrt(hist->GetEntries()));
 
-      sprintf(name, "%s_%.02fmA", argv[1], curr);
+      sprintf(name, "%s_%.00fuA", argv[1], curr * 1000);
       hist->SetName(name);
 
       outFile->cd();
