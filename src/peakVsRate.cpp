@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 {
   if(argc != 4)
     {
-      std::cout << "\tusage: peakVsCurr element listFile dataDir" << std::endl;
+      std::cout << "\tusage: peakVsRate element listFile dataDir" << std::endl;
       return 1;
     }
 
