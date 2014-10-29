@@ -79,6 +79,7 @@ int main(int argc, char* argv[])
   long int firedPix;
   long int hits;
   long int events;
+  int evtM2; // events with more than 2 pixels
   double ratePix;
   double rateXrays;
   double ratePixErr;
@@ -172,6 +173,7 @@ int main(int argc, char* argv[])
 
       firedPix = 0;
       hits = 0;
+      evtM2 = 0;
 
       events = tree->GetEntries();
       for(long int i = 0; i < events; ++i)
@@ -179,20 +181,25 @@ int main(int argc, char* argv[])
 	  tree->GetEntry(i);
 	  firedPix += npix;
 	  // megadirty solution!!! (the array is at most of size 2)
-	  if(npix >= 1)
-	    {  
-	      if(npix == 2)
-		{
-		  dist = sqrt(pow(pcol[1] - pcol[0], 2) + pow(prow[1] - prow[0], 2));
-		  if(dist <= distCut) // one hit from same x ray
-		    hits += 1;
-		  else
-		    hits += 2; // two x rays
-		}
-	      else
+	  if(npix == 2)
+	    {
+	      dist = sqrt(pow(pcol[1] - pcol[0], 2) + pow(prow[1] - prow[0], 2));
+	      if(dist <= distCut) // one hit from same x ray
 		hits += 1;
+	      else
+		hits += 2; // two x rays
+	    }
+	  else
+	    hits += 1;
+	  
+	  if(npix > 2)
+	    {
+	      std::cout << "\t  Event with " << npix << "pixels" << std::endl;
+	      evtM2++;
 	    }
 	}
+
+      if(evtM2) std::cout << "\t  " << evtM2 << " events with more than 2 pixels" << std::endl;
 
       ratePix = firedPix / (events * evtDuration * sensArea) * 1e-3; // [kHz cm^-2]
       rateXrays = hits / (events * evtDuration * sensArea) * 1e-3; // [kHz cm^-2]
