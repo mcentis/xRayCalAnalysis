@@ -190,11 +190,11 @@ int main(int argc, char* argv[])
 		hits += 2; // two x rays
 	    }
 	  else
-	    hits += 1;
+	    if(npix == 1) hits += 1;
 	  
 	  if(npix > 2)
 	    {
-	      std::cout << "\t  Event with " << npix << "pixels" << std::endl;
+	      std::cout << "\t  Event with " << npix << " pixels" << std::endl;
 	      evtM2++;
 	    }
 	}
