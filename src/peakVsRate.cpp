@@ -12,6 +12,7 @@
 #include "TFile.h"
 #include "TDirectory.h"
 #include "TSystem.h"
+#include "TStyle.h"
 
 #include "iostream"
 #include "fstream"
@@ -25,7 +26,15 @@ int main(int argc, char* argv[])
       return 1;
     }
 
-  gSystem->Load("libTree"); // to avoid warnings
+  // big axis labels
+  gStyle->SetLabelSize(0.05, "x");
+  gStyle->SetLabelSize(0.05, "y");
+
+  gStyle->SetTitleSize(0.05, "x");
+  gStyle->SetTitleSize(0.05, "y");
+
+  gStyle->SetTitleOffset(0.95, "x");
+  gStyle->SetTitleOffset(0.95, "y");
 
   const double evtDuration = 25e-9; // 25 ns per event [s]
   const double sensArea = 0.6561; // single chip module area [cm^2]
