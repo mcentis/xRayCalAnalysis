@@ -254,7 +254,7 @@ int main(int argc, char* argv[])
   entriesCurr->SetMarkerSize(2);
   entriesCurr->Draw("AP");
   entriesCurr->GetXaxis()->SetTitle("Tube current [mA]");
-  entriesCurr->GetYaxis()->SetTitle("Measured ionization [Vcal]");
+  entriesCurr->GetYaxis()->SetTitle("Entries");
   entriesCurr->Write();
   entriesCurrCan->Modified();
   entriesCurrCan->Update();
