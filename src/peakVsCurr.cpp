@@ -41,6 +41,11 @@ int main(int argc, char* argv[])
   sprintf(title, "%s line vs tube current", argv[1]);
   peakCurr->SetTitle(title);
 
+  TGraphErrors* sigmaCurr = new TGraphErrors();
+  sigmaCurr->SetName("sigmaCurr");
+  sprintf(title, "#sigma %s line vs tube current", argv[1]);
+  sigmaCurr->SetTitle(title);
+
   TGraphErrors* entriesCurr = new TGraphErrors();
   entriesCurr->SetName("entriesCurr");
   entriesCurr->SetTitle("Number of entries vs tube current");
@@ -97,6 +102,9 @@ int main(int argc, char* argv[])
       peakCurr->SetPoint(nPoint, curr, fit->GetParameter(1));
       peakCurr->SetPointError(nPoint, 0, fit->GetParError(1));
 
+      sigmaCurr->SetPoint(nPoint, curr, fit->GetParameter(2));
+      sigmaCurr->SetPointError(nPoint, 0, fit->GetParError(2));
+
       entriesCurr->SetPoint(nPoint, curr, hist->GetEntries());
       // entriesCurr->SetPointError(nPoint, 0, sqrt(hist->GetEntries()));
 
@@ -119,6 +127,17 @@ int main(int argc, char* argv[])
   peakCurrCan->Modified();
   peakCurrCan->Update();
   peakCurrCan->Write();
+
+  TCanvas* sigmaCurrCan = new TCanvas("sigmaCurrCan");
+  sigmaCurrCan->SetGridx();
+  sigmaCurrCan->SetGridy();
+  sigmaCurr->Draw("AP");
+  sigmaCurr->GetXaxis()->SetTitle("Tube current [mA]");
+  sigmaCurr->GetYaxis()->SetTitle("#sigma peak [Vcal]");
+  sigmaCurr->Write();
+  sigmaCurrCan->Modified();
+  sigmaCurrCan->Update();
+  sigmaCurrCan->Write();
 
   TCanvas* entriesCurrCan = new TCanvas("entriesCurrCan");
   entriesCurrCan->SetGridx();
