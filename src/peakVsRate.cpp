@@ -96,14 +96,15 @@ int main(int argc, char* argv[])
 
 
   //Declaration of leaves types
+  const int maxPix = 2000; // from struct TreeEvent, PixTest.hh, pXar
   UShort_t        header;
   UShort_t        trailer;
   UShort_t        npix;
-  UChar_t         proc[2];
-  UChar_t         pcol[2];
-  UChar_t         prow[2];
-  Double_t        pval[2];
-  Double_t        pq[2];
+  UChar_t         proc[maxPix];
+  UChar_t         pcol[maxPix];
+  UChar_t         prow[maxPix];
+  Double_t        pval[maxPix];
+  Double_t        pq[maxPix];
 
   double dist;
   double distCut = 1; // distance cut for the "clustering"
