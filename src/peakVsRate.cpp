@@ -49,6 +49,7 @@ std::vector<cluster> clusterEvent(UShort_t nPix, UChar_t* col, UChar_t* row, Dou
 
   while(totUsed < nPix)
     {
+      firstNotUsed = -1;
       for(int i = 0; i < nPix; i++) // find first not used pixel
 	{
 	  if(isUsed[i] == false)
@@ -56,6 +57,12 @@ std::vector<cluster> clusterEvent(UShort_t nPix, UChar_t* col, UChar_t* row, Dou
 	      firstNotUsed = i;
 	      break;
 	    }
+	}
+
+      if(firstNotUsed == -1)
+	{
+	  std::cout << "\tWARNING: Unexpected end of clustering" << std::cout;
+	  break;
 	}
 
       clu = new cluster(); // start cluster
@@ -96,6 +103,8 @@ std::vector<cluster> clusterEvent(UShort_t nPix, UChar_t* col, UChar_t* row, Dou
 	    }
 	} while(growing);
 
+      clustVec.push_back(*clu);
+      delete clu;
     }
 
   return clustVec;
