@@ -96,7 +96,7 @@ std::vector<cluster> clusterEvent(UShort_t nPix, UChar_t* col, UChar_t* row, Dou
 			  isUsed[i] = true;
 			  totUsed++;
 			  growing = true;
-			  break;
+			  break; // 1 pix at time, and preserve growing information
 			}
 		    }
 		}
@@ -130,6 +130,7 @@ int main(int argc, char* argv[])
 
   const double evtDuration = 25e-9; // 25 ns per event [s]
   const double sensArea = 0.6561; // single chip module area [cm^2]
+  const double distCut = sqrt(2); // distance cut for clustering
 
   TFile* inFile;
   char fileName[200];
@@ -177,15 +178,16 @@ int main(int argc, char* argv[])
   TTree* tree;
   TF1* fit;
   TH1* hist;
+  TH1D* histClustered;
+  TH1I* clustSize;
   long int firedPix;
   long int hits;
   long int events;
-  int evtM2; // events with more than 2 pixels
   double ratePix;
   double rateXrays;
   double ratePixErr;
   double rateXraysErr;
-
+  std::vector<cluster> cluVec;
 
   //Declaration of leaves types
   const int maxPix = 2000; // from struct TreeEvent, PixTest.hh, pXar
@@ -197,9 +199,6 @@ int main(int argc, char* argv[])
   UChar_t         prow[maxPix];
   Double_t        pval[maxPix];
   Double_t        pq[maxPix];
-
-  double dist;
-  double distCut = 1; // distance cut for the "clustering"
 
   float curr;
   std::string file;
@@ -275,33 +274,33 @@ int main(int argc, char* argv[])
 
       firedPix = 0;
       hits = 0;
-      evtM2 = 0;
+
+      sprintf(name, "%s_%.00fuA_clustered", argv[1], curr * 1000);
+      histClustered = new TH1D(name, "Clustered charge;Charge [Vcal];Entries / bin", 301, -0.5, 300.5);
+
+      sprintf(name, "%s_%.00fuA_clulsterSize", argv[1], curr * 1000);
+      clustSize = new TH1I(name, "Cluster size (zero suppressed);Cluster size [Pixel];Entries / bin", 11, -0.5, 10.50);
 
       events = tree->GetEntries();
       for(long int i = 0; i < events; ++i)
 	{
 	  tree->GetEntry(i);
 	  firedPix += npix;
-	  // megadirty solution!!! (the array is at most of size 2)
-	  if(npix == 2)
+
+	  cluVec = clusterEvent(npix, pcol, prow, pq, distCut);
+
+	  hits += cluVec.size();
+
+	  for(std::vector<cluster>::iterator it = cluVec.begin(); it != cluVec.end(); ++it)
 	    {
-	      dist = sqrt(pow(pcol[1] - pcol[0], 2) + pow(prow[1] - prow[0], 2));
-	      if(dist <= distCut) // one hit from same x ray
-		hits += 1;
-	      else
-		hits += 2; // two x rays
-	    }
-	  else
-	    if(npix == 1) hits += 1;
-	  
-	  if(npix > 2)
-	    {
-	      std::cout << "\t  Event with " << npix << " pixels" << std::endl;
-	      evtM2++;
+	      histClustered->Fill(it->totCharge);
+
+	      if(it->nPix != 0) clustSize->Fill(it->nPix);
 	    }
 	}
 
-      if(evtM2) std::cout << "\t  " << evtM2 << " events with more than 2 pixels" << std::endl;
+      histClustered->Write();
+      clustSize->Write();
 
       ratePix = firedPix / (events * evtDuration * sensArea) * 1e-3; // [kHz cm^-2]
       rateXrays = hits / (events * evtDuration * sensArea) * 1e-3; // [kHz cm^-2]
