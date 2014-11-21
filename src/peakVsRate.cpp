@@ -203,6 +203,9 @@ int main(int argc, char* argv[])
   float curr;
   std::string file;
 
+  const double negSigma = 1; // fit limits
+  const double posSigma = 1.5;
+
   std::ifstream listStr(argv[2], std::ifstream::in);
   if(listStr.is_open() == false)
     {
@@ -240,7 +243,7 @@ int main(int argc, char* argv[])
       	  continue;
       	}
 
-      fit = fitPeak(hist, 1, 1.5);
+      fit = fitPeak(hist, negSigma, posSigma);
 
       nPoint = peakCurr->GetN();
       peakCurr->SetPoint(nPoint, curr, fit->GetParameter(1));
@@ -298,6 +301,8 @@ int main(int argc, char* argv[])
 	      if(it->nPix != 0) clustSize->Fill(it->nPix);
 	    }
 	}
+
+      fitPeak(histClustered, negSigma, posSigma);
 
       histClustered->Write();
       clustSize->Write();
