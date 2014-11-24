@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
   sprintf(title, "Rate %s line (pixels) vs tube repetition", argv[1]);
   rate_pixRep->SetTitle(title);
 
-  TH1D* peakDistr = new TH1D("peakDistr", "Distribution of the peaks;Charge [Vcal];Entries / bin", 301, -0.5, 300.5);
-  TH1D* sigmaDistr = new TH1D("sigmaDistr", "Distribution of the peaks sigma;Charge [Vcal];Entries / bin", 36, -0.5, 35.5);
+  TH1D* peakDistr = new TH1D("peakDistr", "Distribution of the peaks;Charge [Vcal];Entries / bin", 3010, -0.5, 300.5);
+  TH1D* sigmaDistr = new TH1D("sigmaDistr", "Distribution of the peaks sigma;Charge [Vcal];Entries / bin", 360, -0.5, 35.5);
 
   int nPoint = 0;
 
