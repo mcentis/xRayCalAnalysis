@@ -86,6 +86,9 @@ int main(int argc, char* argv[])
   sprintf(title, "Rate %s line (pixels) vs tube repetition", argv[1]);
   rate_pixRep->SetTitle(title);
 
+  TH1D* peakDistr = new TH1D("peakDistr", "Distribution of the peaks;Charge [Vcal];Entries / bin", 301, -0.5, 300.5);
+  TH1D* sigmaDistr = new TH1D("sigmaDistr", "Distribution of the peaks sigma;Charge [Vcal];Entries / bin", 36, -0.5, 35.5);
+
   int nPoint = 0;
 
   TDirectory* dir;
@@ -168,6 +171,9 @@ int main(int argc, char* argv[])
 
       entriesRep->SetPoint(nPoint, rep, hist->GetEntries());
       entriesRep->SetPointError(nPoint, 0.01, sqrt(hist->GetEntries()));
+
+      peakDistr->Fill(fit->GetParameter(1));
+      sigmaDistr->Fill(fit->GetParameter(2));
 
       sprintf(name, "%s_%.00f", argv[1], rep);
       hist->SetName(name);
@@ -338,6 +344,9 @@ int main(int argc, char* argv[])
   pixRepCan->Modified();
   pixRepCan->Update();
   pixRepCan->Write();
+
+  peakDistr->Write();
+  sigmaDistr->Write();
 
   outFile->Close();
 
