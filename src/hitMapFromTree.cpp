@@ -2,6 +2,8 @@
  * program to produce a hitmap from the tree with the events
  */
 
+#include "rocToModuleCR.hh"
+
 #include "TH1.h"
 #include "TH2.h"
 #include "TTree.h"
@@ -14,28 +16,6 @@
 #include "iostream"
 #include "fstream"
 #include "math.h"
-
-void moduleColRow(UChar_t roc, UChar_t col, UChar_t row, UChar_t* modCR) // returns module col and row
-{
-  modCR[0] = -1;
-  modCR[1] = -1;
-
-  const UChar_t nCol = 52; // number of columns in a roc
-  const UChar_t nRow = 80; // number of rows in a roc
-
-  if(roc < 8)
-    {
-      modCR[0] = roc * nCol + col;
-      modCR[1] = row;
-    }
-  else
-    {
-      modCR[0] = 8 * nCol - (roc - 8) * nCol - col;
-      modCR[1] = 2 * nRow - row;
-    }
-
-  return;
-}
 
 int main(int argc, char* argv[])
 {
@@ -57,10 +37,6 @@ int main(int argc, char* argv[])
 
   // const double evtDuration = 25e-9; // 25 ns per event [s]
   // const double sensArea = 0.6561; // single chip module area [cm^2]
-
-  const char* fileName = "hitMapFromTree.root";
-  TFile* outFile = new TFile(fileName, "RECREATE");
-  std::cout << "\t Output file : " << outFile->GetName() << std::endl;
 
   char title[50];
   char name[50];
@@ -86,6 +62,7 @@ int main(int argc, char* argv[])
   // long int firedPix;
   // long int hits;
   long int events;
+  long int totPix = 0;
   // double ratePix;
   // double rateXrays;
   // double ratePixErr;
@@ -109,9 +86,9 @@ int main(int argc, char* argv[])
   inFile = TFile::Open(argv[1]);
   std::cout << "\t Input file : " << inFile->GetName() << std::endl;
 
-  if(inFile == 0)
+  if(inFile->IsZombie())
     {
-      std::cout << "\tERROR: could not open " << fileName << std::endl;
+      std::cout << "\tERROR: could not open " << argv[1] << std::endl;
       return -1;
     }
   
@@ -139,7 +116,7 @@ int main(int argc, char* argv[])
   tree->SetBranchAddress("pval",pval);
   tree->SetBranchAddress("pq",pq);
 
-  UChar_t modCR[2] = {0}; // module column and row
+  int modCR[2] = {0}; // module column and row
 
   events = tree->GetEntries();
 
@@ -149,7 +126,15 @@ int main(int argc, char* argv[])
     {
       tree->GetEntry(i);
 
+      if(npix >= 2000)
+	{
+	  std::cout << "Event with " << npix << " pixels" << std::endl;
+	  continue;
+	}
+
       pixEvt->Fill(npix);
+
+      totPix += npix;
 
       for(int j = 0; j < npix; ++j)
 	{
@@ -160,8 +145,8 @@ int main(int argc, char* argv[])
 
 	  if(proc[j] < 16 && proc[j] >= 0)
 	    singleRocs[proc[j]]->Fill(pcol[j], prow[j]);
-	  else
-	    std::cout << "\t ERROR: ROC number not good!!! Got " << (int) proc[j] << std::endl;
+	  // else
+	  //   std::cout << "\t ERROR: ROC number not good!!! Got " << (int) proc[j] << std::endl;
  
 	  rocs->Fill(proc[j]);
 	}
@@ -169,20 +154,29 @@ int main(int argc, char* argv[])
 
   std::cout << "out loop " << std::endl;
 
-  inFile->Close();
+  //inFile->Close();
 
-  std::cout << "closed in " << std::endl;
+  // std::cout << "closed in " << std::endl;
 
-  outFile->cd();
+  std::cout << "Tot fired pixels " << totPix << std::endl;
+  std::cout << "Entries in hitmap " << hitMap->GetEntries() << std::endl;
 
-  std::cout << "cd out " << std::endl;
+  // outFile->cd();
+
+  // std::cout << "cd out " << std::endl;
+
+  const char* fileName = "hitMapFromTree.root";
+  TFile* outFile = new TFile(fileName, "RECREATE");
+  std::cout << "la la la "  << std::endl;
+  //TFile* outFile = TFile::Open(fileName, "RECREATE");
+  std::cout << "\t Output file : " << outFile->GetName() << std::endl;
 
   hitMap->Write();
-  pixEvt->Write();
-  rocs->Write();
+  // pixEvt->Write();
+  // rocs->Write();
 
-  for(int i = 0; i < 16; ++i)
-    singleRocs[i]->Write();
+  // for(int i = 0; i < 16; ++i)
+  //   singleRocs[i]->Write();
 
   std::cout << "wrote histo " << std::endl;
 

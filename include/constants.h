@@ -1,5 +1,5 @@
 /*
- * file with definition of constants for the program
+ * file with definition of constants for the programs
  */
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
