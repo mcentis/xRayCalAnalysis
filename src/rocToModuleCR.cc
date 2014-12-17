@@ -1,4 +1,5 @@
 #include "rocToModuleCR.hh"
+#include "constants.h"
 
 void moduleColRow(int roc, int col, int row, int* modCR) // calculates module col and row
 {

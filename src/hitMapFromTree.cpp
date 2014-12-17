@@ -3,6 +3,7 @@
  */
 
 #include "rocToModuleCR.hh"
+#include "constants.h"
 
 #include "TH1.h"
 #include "TH2.h"

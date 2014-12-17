@@ -11,6 +11,11 @@
 #include "TCanvas.h"
 #include "TDirectory.h"
 
+// these constants must be here, otherwise there are problems in compiling
+const int nHist = 4; // number of histos
+const char* histNames[nHist] = {"q_Cu_C0_V0", "q_Mo_C0_V0", "q_Ag_C0_V0", "q_Sn_C0_V0"}; // histo names
+const double peakIon[nHist] = {CuIon, MoIon, AgIon, SnIon}; // ionization assigned to the peacks
+
 calSingleT::calSingleT(const char* inFilePath, float temperature)
 {
   temp = temperature;

@@ -11,8 +11,8 @@ const double SnIon = (25044.04 + 25271.36) / (2 * 3.6);
 const double TeIon = (27201.99 + 27472.57) / (2 * 3.6);
 const double BaIon = (31816.615 + 32193.262) / (2 * 3.6);
 
-const int nHist = 4; // number of histos
-const char* histNames[nHist] = {"q_Cu_C0_V0", "q_Mo_C0_V0", "q_Ag_C0_V0", "q_Sn_C0_V0"}; // histo names
-const double peakIon[nHist] = {CuIon, MoIon, AgIon, SnIon}; // ionization assigned to the peacks
+// roc dimensions
+const int nCol = 52; // number of columns in a roc
+const int nRow = 80; // number of rows in a roc
 
 #endif //#ifndef CONSTANTS_H
