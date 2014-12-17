@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
   std::cout << "\t Output file : " << outFile->GetName() << std::endl;
 
   TH2D* hitMap = new TH2D("hitMap", "Module hit map (if it is a module)", 416, -0.5, 415.5, 160, -0.5, 159.5);
+  TH2D* nEntries = new TH2D("nEntries", "Pixels fired in each ROC", 8, -0.5, 7.5, 2, -0.5, 1.5); // draw whith colztext to have numbers superimposed to the bins
 
   TFile* inFile;
   inFile = TFile::Open(argv[2]);
@@ -80,6 +81,11 @@ int main(int argc, char* argv[])
 
       std::cout << "\tINFO Found histogram " << histName << std::endl;
 
+      if(iRoc < 8)
+	nEntries->SetBinContent(iRoc + 1, 1, hist->GetEntries());
+      else
+	nEntries->SetBinContent(16 - iRoc, 2, hist->GetEntries());
+
       for(int iColBin = 1; iColBin < nCol + 1; iColBin++)
 	for(int iRowBin = 1; iRowBin < nRow + 1; iRowBin++)
 	  {
@@ -93,9 +99,38 @@ int main(int argc, char* argv[])
 	  }
     }
 
-  inFile->Close();
+  // projections
+  TH1D* projX = hitMap->ProjectionX("projX");
+  projX->SetTitle("Projection of the hitmap on X;Col;Entries");
+
+  TH1D* projY = hitMap->ProjectionY("projY");
+  projY->SetTitle("Projection of the hitmap on Y;Row;Entries");
+
+  TCanvas* hitCan = new TCanvas("hitMapCan", "Hit map");
+  hitCan->Divide(2, 2);
+  hitCan->cd(1);
+  projX->SetFillColor(602);
+  projX->Draw();
+  hitCan->cd(2);
+  nEntries->Draw("TEXTCOLZ");
+  hitCan->cd(3);
+  hitMap->Draw("COLZ");
+  hitCan->cd(4);
+  projY->SetFillColor(602);
+  projY->Draw("HBAR");
+
+
   outFile->cd();
+
+  hitCan->Write();
   hitMap->Write();
+  nEntries->Write(); // draw whith colztext to have numbers superimposed to the bins
+
+  projX->SetFillColor(kWhite);
+  projY->SetFillColor(kWhite);
+  projX->Write();
+  projY->Write();
+ 
   outFile->Close();
 
   return 0;
