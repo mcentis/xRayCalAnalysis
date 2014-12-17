@@ -119,7 +119,6 @@ int main(int argc, char* argv[])
   projY->SetFillColor(602);
   projY->Draw("HBAR");
 
-
   outFile->cd();
 
   hitCan->Write();
