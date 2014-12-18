@@ -87,6 +87,12 @@ int main(int argc, char* argv[])
   inFile = TFile::Open(argv[1]);
   std::cout << "\t Input file : " << inFile->GetName() << std::endl;
 
+  const char* fileName = "hitMapFromTree.root";
+  TFile* outFile = new TFile(fileName, "RECREATE");
+  std::cout << "la la la "  << std::endl;
+  //TFile* outFile = TFile::Open(fileName, "RECREATE");
+  std::cout << "\t Output file : " << outFile->GetName() << std::endl;
+
   if(inFile->IsZombie())
     {
       std::cout << "\tERROR: could not open " << argv[1] << std::endl;
@@ -166,15 +172,9 @@ int main(int argc, char* argv[])
 
   // std::cout << "cd out " << std::endl;
 
-  const char* fileName = "hitMapFromTree.root";
-  TFile* outFile = new TFile(fileName, "RECREATE");
-  std::cout << "la la la "  << std::endl;
-  //TFile* outFile = TFile::Open(fileName, "RECREATE");
-  std::cout << "\t Output file : " << outFile->GetName() << std::endl;
-
   hitMap->Write();
-  // pixEvt->Write();
-  // rocs->Write();
+  pixEvt->Write();
+  rocs->Write();
 
   // for(int i = 0; i < nRoc; ++i)
   //   singleRocs[i]->Write();
