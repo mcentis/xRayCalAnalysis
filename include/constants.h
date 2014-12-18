@@ -15,4 +15,6 @@ const double BaIon = (31816.615 + 32193.262) / (2 * 3.6);
 const int nCol = 52; // number of columns in a roc
 const int nRow = 80; // number of rows in a roc
 
+const int nRoc = 16;
+
 #endif //#ifndef CONSTANTS_H

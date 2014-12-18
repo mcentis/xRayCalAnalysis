@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   int modCR[2] = {0};
   double content  = 0;
 
-  for(int iRoc = 0; iRoc < 16; ++iRoc)
+  for(int iRoc = 0; iRoc < nRoc; ++iRoc)
     {
       sprintf(histName, "hMap_%s_C%i_V0", argv[1], iRoc);
       hist = (TH2*) dir->Get(histName);

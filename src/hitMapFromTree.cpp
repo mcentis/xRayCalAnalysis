@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
   TH1I* pixEvt = new TH1I("pixEvt", "Fired pxels per event;Fired pix per event;Entries", 1000, -0.5, 999.5);
   TH1I* rocs = new TH1I("rocs", "Rocs where pix fired;Roc number;Entries", 16, -0.5, 15.5);
 
-  TH2D* singleRocs[16];
-  for(int i = 0; i < 16; ++i)
+  TH2D* singleRocs[nRoc];
+  for(int i = 0; i < nRoc; ++i)
     {
       sprintf(name, "hitmapRoc_%i", i);
       sprintf(title, "Hit map of Roc %i;Col;Row", i);
@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
 	  // pcolMod[j] = modCR[0];
 	  // prowMod[j] = modCR[1];
 
-	  if(proc[j] < 16 && proc[j] >= 0)
+	  if(proc[j] < nRoc && proc[j] >= 0)
 	    singleRocs[proc[j]]->Fill(pcol[j], prow[j]);
 	  // else
 	  //   std::cout << "\t ERROR: ROC number not good!!! Got " << (int) proc[j] << std::endl;
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
   // pixEvt->Write();
   // rocs->Write();
 
-  // for(int i = 0; i < 16; ++i)
+  // for(int i = 0; i < nRoc; ++i)
   //   singleRocs[i]->Write();
 
   std::cout << "wrote histo " << std::endl;
