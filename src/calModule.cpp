@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
       calGr[i] = new TGraphErrors();
       calGr[i]->SetName(name);
       calGr[i]->SetTitle(title);
+      calGr[i]->SetMarkerStyle(22);
     }
 
   TFile* inFile;
@@ -63,7 +64,7 @@ int main(int argc, char* argv[])
 
   int nPoint = 0;
   const double negSigma = 0.5; // fit limits
-  const double posSigma = 1;
+  const double posSigma = 1.5;
 
   double ionization;
   std::string file;
