@@ -127,8 +127,6 @@ int main(int argc, char* argv[])
 
   events = tree->GetEntries();
 
-  std::cout << events << std::endl;
-
   for(long int i = 0; i < events; ++i)
     {
       tree->GetEntry(i);
@@ -147,43 +145,49 @@ int main(int argc, char* argv[])
 	{
 	  moduleColRow(proc[j], pcol[j], prow[j], modCR);
 	  hitMap->Fill(modCR[0], modCR[1]);
-	  // pcolMod[j] = modCR[0];
-	  // prowMod[j] = modCR[1];
 
-	  if(proc[j] < nRoc && proc[j] >= 0)
-	    singleRocs[proc[j]]->Fill(pcol[j], prow[j]);
-	  // else
-	  //   std::cout << "\t ERROR: ROC number not good!!! Got " << (int) proc[j] << std::endl;
+	  singleRocs[proc[j]]->Fill(pcol[j], prow[j]);
  
 	  rocs->Fill(proc[j]);
 	}
     }
 
-  std::cout << "out loop " << std::endl;
-
-  //inFile->Close();
-
-  // std::cout << "closed in " << std::endl;
-
   std::cout << "Tot fired pixels " << totPix << std::endl;
   std::cout << "Entries in hitmap " << hitMap->GetEntries() << std::endl;
 
-  // outFile->cd();
+  // projections
+  TH1D* projX = hitMap->ProjectionX("projX");
+  projX->SetTitle("Projection of the hitmap on X;Col;Entries");
 
-  // std::cout << "cd out " << std::endl;
+  TH1D* projY = hitMap->ProjectionY("projY");
+  projY->SetTitle("Projection of the hitmap on Y;Row;Entries");
+
+  TCanvas* hitCan = new TCanvas("hitMapCan", "Hit map");
+  hitCan->Divide(2, 2);
+  hitCan->cd(1);
+  projX->SetFillColor(602);
+  projX->Draw();
+  // hitCan->cd(2);
+  // nEntries->Draw("TEXTCOLZ");
+  hitCan->cd(3);
+  hitMap->Draw("COLZ");
+  hitCan->cd(4);
+  projY->SetFillColor(602);
+  projY->Draw("HBAR");
 
   hitMap->Write();
   pixEvt->Write();
   rocs->Write();
 
-  // for(int i = 0; i < nRoc; ++i)
-  //   singleRocs[i]->Write();
+  projX->SetFillColor(kWhite);
+  projY->SetFillColor(kWhite);
+  projX->Write();
+  projY->Write();
 
-  std::cout << "wrote histo " << std::endl;
+  for(int i = 0; i < nRoc; ++i)
+    singleRocs[i]->Write();
 
   outFile->Close();
-
-  std::cout << "closed out " << std::endl;
 
   return 0;
 }

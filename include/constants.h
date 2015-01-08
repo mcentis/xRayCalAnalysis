@@ -18,6 +18,9 @@ const int nRow = 80; // number of rows in a roc
 
 const int nRoc = 16;
 
+const double evtDuration = 25e-9; // 25 ns per event [s]
+const double sensArea = 0.6561; // single chip module area [cm^2]
+
 // error on measured ionization
 const double errIon = 0.5; // [Vcal]
 

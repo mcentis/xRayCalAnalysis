@@ -4,6 +4,7 @@
 
 #include "fitPeak.hh"
 #include "clusterDefAndFunction.hh"
+#include "constants.h"
 
 #include "TH1.h"
 #include "TF1.h"
@@ -37,8 +38,6 @@ int main(int argc, char* argv[])
   gStyle->SetTitleOffset(0.95, "x");
   gStyle->SetTitleOffset(0.95, "y");
 
-  const double evtDuration = 25e-9; // 25 ns per event [s]
-  const double sensArea = 0.6561; // single chip module area [cm^2]
   const double distCut = sqrt(2); // distance cut for clustering
 
   TFile* inFile;
