@@ -13,8 +13,8 @@ void moduleColRow(int roc, int col, int row, int* modCR) // calculates module co
     }
   else
     {
-      modCR[0] = 8 * nCol - (roc - 8) * nCol - col;
-      modCR[1] = 2 * nRow - row;
+      modCR[0] = 8 * nCol - (roc - 8) * nCol - col - 1;
+      modCR[1] = 2 * nRow - row - 1;
     }
 
   return;

@@ -93,10 +93,7 @@ int main(int argc, char* argv[])
 	    // the + and - 1 in this scope are due to bin to pix conversion
 	    moduleColRow(iRoc, iColBin - 1, iRowBin - 1, modCR);
 	    content = hist->GetBinContent(iColBin, iRowBin);
-	    if(iRoc < 8)
-	      hitMap->SetBinContent(modCR[0] + 1, modCR[1] + 1, content);
-	    else
-	      hitMap->SetBinContent(modCR[0], modCR[1], content);
+	    hitMap->SetBinContent(modCR[0] + 1, modCR[1] + 1, content);
 	  }
     }
 
