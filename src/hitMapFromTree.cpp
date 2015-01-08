@@ -36,13 +36,8 @@ int main(int argc, char* argv[])
   gStyle->SetTitleOffset(0.95, "x");
   gStyle->SetTitleOffset(0.95, "y");
 
-  // const double evtDuration = 25e-9; // 25 ns per event [s]
-  // const double sensArea = 0.6561; // single chip module area [cm^2]
-
   char title[50];
   char name[50];
-  // char histName[50]; // name of the histo to look for
-  // sprintf(histName, "q_%s_C0_V0", argv[1]);
 
   TH2D* hitMap = new TH2D("hitMap", "Module hit map (if it is a module)", 416, -0.5, 415.5, 160, -0.5, 159.5);
   TH1I* pixEvt = new TH1I("pixEvt", "Fired pxels per event;Fired pix per event;Entries", 1000, -0.5, 999.5);
@@ -56,14 +51,11 @@ int main(int argc, char* argv[])
       singleRocs[i] = new TH2D(name, title, 52, -0.5, 51.5, 80, -0.5, 79.5);
     }
 
-  std::cout << "created histos" << std::endl;
-
   TDirectory* dir;
   TTree* tree;
-  // long int firedPix;
   // long int hits;
   long int events;
-  long int totPix = 0;
+  long int firedPix = 0;
   // double ratePix;
   // double rateXrays;
   // double ratePixErr;
@@ -80,17 +72,12 @@ int main(int argc, char* argv[])
   Double_t        pval[maxPix];
   Double_t        pq[maxPix];
 
-  // UChar_t         pcolMod[maxPix]; // module col and row
-  // UChar_t         prowMod[maxPix];
-
   TFile* inFile;
   inFile = TFile::Open(argv[1]);
   std::cout << "\t Input file : " << inFile->GetName() << std::endl;
 
   const char* fileName = "hitMapFromTree.root";
   TFile* outFile = new TFile(fileName, "RECREATE");
-  std::cout << "la la la "  << std::endl;
-  //TFile* outFile = TFile::Open(fileName, "RECREATE");
   std::cout << "\t Output file : " << outFile->GetName() << std::endl;
 
   if(inFile->IsZombie())
@@ -139,7 +126,7 @@ int main(int argc, char* argv[])
 
       pixEvt->Fill(npix);
 
-      totPix += npix;
+      firedPix += npix;
 
       for(int j = 0; j < npix; ++j)
 	{
@@ -152,8 +139,9 @@ int main(int argc, char* argv[])
 	}
     }
 
-  std::cout << "Tot fired pixels " << totPix << std::endl;
+  std::cout << "Tot fired pixels " << firedPix << std::endl;
   std::cout << "Entries in hitmap " << hitMap->GetEntries() << std::endl;
+  std::cout << "Rate module " << firedPix / (evtDuration * events * sensArea * 16) * 1e-3 << " kHz / cm2" << std::endl;
 
   // projections
   TH1D* projX = hitMap->ProjectionX("projX");
@@ -175,6 +163,7 @@ int main(int argc, char* argv[])
   projY->SetFillColor(602);
   projY->Draw("HBAR");
 
+  hitCan->Write();
   hitMap->Write();
   pixEvt->Write();
   rocs->Write();
