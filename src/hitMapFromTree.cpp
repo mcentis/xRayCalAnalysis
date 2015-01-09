@@ -10,6 +10,7 @@
 #include "TTree.h"
 #include "TCanvas.h"
 #include "TFile.h"
+#include "TGraphErrors.h"
 #include "TDirectory.h"
 #include "TSystem.h"
 #include "TStyle.h"
@@ -40,8 +41,13 @@ int main(int argc, char* argv[])
   char name[50];
 
   TH2D* hitMap = new TH2D("hitMap", "Module hit map (if it is a module)", 416, -0.5, 415.5, 160, -0.5, 159.5);
-  TH1I* pixEvt = new TH1I("pixEvt", "Fired pxels per event;Fired pix per event;Entries", 1000, -0.5, 999.5);
+  TH1I* pixEvt = new TH1I("pixEvt", "Fired pxels per event;Fired pix per event;Entries", 100, -0.5, 99.5);
   TH1I* rocs = new TH1I("rocs", "Rocs where pix fired;Roc number;Entries", 16, -0.5, 15.5);
+  TH2D* histPixRate = new TH2D("histPixRate", "Rate pixels fired in each ROC;;;kHz cm^{-2}", 8, -0.5, 7.5, 2, -0.5, 1.5); // draw whith colztext to have numbers superimposed to the bins
+  TGraphErrors* pixRateGr = new TGraphErrors();
+  pixRateGr->SetName("pixRateGr");
+  pixRateGr->SetTitle("Rate of fired pixels");
+  pixRateGr->SetMarkerStyle(22);
 
   TH2D* singleRocs[nRoc];
   for(int i = 0; i < nRoc; ++i)
@@ -56,9 +62,10 @@ int main(int argc, char* argv[])
   // long int hits;
   long int events;
   long int firedPix = 0;
-  // double ratePix;
+  long int firedPixRoc[nRoc] = {0};
+  double ratePixRoc[nRoc] = {0};
   // double rateXrays;
-  // double ratePixErr;
+  double ratePixErrRoc[nRoc] = {0};
   // double rateXraysErr;
 
   //Declaration of leaves types
@@ -136,12 +143,37 @@ int main(int argc, char* argv[])
 	  singleRocs[proc[j]]->Fill(pcol[j], prow[j]);
  
 	  rocs->Fill(proc[j]);
+
+	  ++firedPixRoc[proc[j]];
 	}
+    }
+
+  for(int i = 0; i < nRoc; ++i)
+    {
+      ratePixRoc[i] = firedPixRoc[i] / (evtDuration * events * sensArea) * 1e-3;// kHz / cm2
+      ratePixErrRoc[i] = sqrt(firedPixRoc[i]) / (evtDuration * events * sensArea) * 1e-3;// kHz / cm2
     }
 
   std::cout << "Tot fired pixels " << firedPix << std::endl;
   std::cout << "Entries in hitmap " << hitMap->GetEntries() << std::endl;
   std::cout << "Rate module " << firedPix / (evtDuration * events * sensArea * 16) * 1e-3 << " kHz / cm2" << std::endl;
+
+  for(int iRoc = 0; iRoc < nRoc; ++iRoc)
+    {
+      if(iRoc < 8)
+	histPixRate->SetBinContent(iRoc + 1, 1, ratePixRoc[iRoc]);
+      else
+	histPixRate->SetBinContent(16 - iRoc, 2, ratePixRoc[iRoc]);
+
+      pixRateGr->SetPoint(iRoc, iRoc, ratePixRoc[iRoc]);
+      pixRateGr->SetPointError(iRoc, 0, ratePixErrRoc[iRoc]);
+    }
+
+  TCanvas* serv = new TCanvas("serv");
+  pixRateGr->Draw("AP");
+  pixRateGr->GetXaxis()->SetTitle("ROC");
+  pixRateGr->GetYaxis()->SetTitle("Rate [kHz cm^{-2}]");
+  delete serv;
 
   // projections
   TH1D* projX = hitMap->ProjectionX("projX");
@@ -155,8 +187,8 @@ int main(int argc, char* argv[])
   hitCan->cd(1);
   projX->SetFillColor(602);
   projX->Draw();
-  // hitCan->cd(2);
-  // nEntries->Draw("TEXTCOLZ");
+  hitCan->cd(2);
+  histPixRate->Draw("TEXTCOLZ");
   hitCan->cd(3);
   hitMap->Draw("COLZ");
   hitCan->cd(4);
@@ -172,6 +204,7 @@ int main(int argc, char* argv[])
   projY->SetFillColor(kWhite);
   projX->Write();
   projY->Write();
+  pixRateGr->Write();
 
   for(int i = 0; i < nRoc; ++i)
     singleRocs[i]->Write();
