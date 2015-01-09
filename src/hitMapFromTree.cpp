@@ -156,7 +156,8 @@ int main(int argc, char* argv[])
 
   std::cout << "Tot fired pixels " << firedPix << std::endl;
   std::cout << "Entries in hitmap " << hitMap->GetEntries() << std::endl;
-  std::cout << "Rate module " << firedPix / (evtDuration * events * sensArea * 16) * 1e-3 << " kHz / cm2" << std::endl;
+  std::cout << "Rate module " << firedPix / (evtDuration * events * sensArea * 16) * 1e-3
+	    << " +- " << sqrt(firedPix) / (evtDuration * events * sensArea * 16) * 1e-3 << " kHz / cm2" << std::endl;
 
   for(int iRoc = 0; iRoc < nRoc; ++iRoc)
     {
