@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
   TGraphErrors* sigmaRepRoc[nRoc];
   TGraphErrors* peakRate_pixRoc[nRoc];
   TGraphErrors* rate_pixRepRoc[nRoc];
+  TH1D* peakDistrRoc[nRoc];
 
   int iColor;
   int iMarker;
@@ -107,6 +108,10 @@ int main(int argc, char* argv[])
       rate_pixRepRoc[iRoc]->SetFillColor(kWhite);
       rate_pixRepRoc[iRoc]->SetMarkerColor(iColor);
       rate_pixRepRoc[iRoc]->SetMarkerStyle(iMarker);
+
+      sprintf(name, "peakDistrRoc_%i", iRoc);
+      sprintf(title, "Peak distribution, ROC %i;Peak position [Vcal];Entries/bin", iRoc);
+      peakDistrRoc[iRoc] = new TH1D(name, title, 3010, -0.5, 300.5);
     }
 
   TMultiGraph* peakRep = new TMultiGraph();
@@ -119,19 +124,24 @@ int main(int argc, char* argv[])
   sprintf(title, "#sigma %s line vs repetition", argv[1]);
   sigmaRep->SetTitle(title);
 
-  TGraphErrors* entriesRep = new TGraphErrors();
-  entriesRep->SetName("entriesRep");
-  entriesRep->SetTitle("Number of entries vs repetition");
+  TGraphErrors* entriesRepMod = new TGraphErrors();
+  entriesRepMod->SetName("entriesRepMod");
+  entriesRepMod->SetTitle("Number of entries vs repetition");
 
   TMultiGraph* peakRate_pix = new TMultiGraph();
   peakRate_pix->SetName("peakRate_pix");
   sprintf(title, "%s line vs pix rate", argv[1]);
   peakRate_pix->SetTitle(title);
 
-  TGraphErrors* rate_pixRep = new TGraphErrors();
+  TMultiGraph* rate_pixRep = new TMultiGraph();
   rate_pixRep->SetName("rate_pixRep");
-  sprintf(title, "Rate %s line (pixels) vs repetition, whole module", argv[1]);
+  sprintf(title, "Rate %s line (pixels) vs repetition", argv[1]);
   rate_pixRep->SetTitle(title);
+
+  TGraphErrors* rate_pixRepMod = new TGraphErrors();
+  rate_pixRepMod->SetName("rate_pixRepMod");
+  sprintf(title, "Rate %s line (pixels) vs repetition, whole module", argv[1]);
+  rate_pixRepMod->SetTitle(title);
 
   // TH1D* peakDistr = new TH1D("peakDistr", "Distribution of the peaks;Charge [Vcal];Entries / bin", 3010, -0.5, 300.5);
   // TH1D* sigmaDistr = new TH1D("sigmaDistr", "Distribution of the peaks sigma;Charge [Vcal];Entries / bin", 360, -0.5, 35.5);
@@ -233,11 +243,13 @@ int main(int argc, char* argv[])
 	  
 	  sigmaRepRoc[iRoc]->SetPoint(nPoint, rep, fit->GetParameter(2));
 	  sigmaRepRoc[iRoc]->SetPointError(nPoint, 0, fit->GetParError(2));
+
+	  peakDistrRoc[iRoc]->Fill(fit->GetParameter(1));
 	}
 
-      nPoint = entriesRep->GetN();
-      entriesRep->SetPoint(nPoint, rep, totEntries);
-      entriesRep->SetPointError(nPoint, 0, sqrt(totEntries));
+      nPoint = entriesRepMod->GetN();
+      entriesRepMod->SetPoint(nPoint, rep, totEntries);
+      entriesRepMod->SetPointError(nPoint, 0, sqrt(totEntries));
 
       // peakDistr->Fill(fit->GetParameter(1));
       // sigmaDistr->Fill(fit->GetParameter(2));
@@ -298,10 +310,10 @@ int main(int argc, char* argv[])
       ratePix = firedPix / (events * evtDuration * sensArea * 16) * 1e-3; // [kHz cm^-2]
       ratePixErr = sqrt(firedPix) / (events * evtDuration * sensArea * 16) * 1e-3; // [kHz cm^-2]
 
-      nPoint = rate_pixRep->GetN();
+      nPoint = rate_pixRepMod->GetN();
 
-      rate_pixRep->SetPoint(nPoint, rep, ratePix);
-      rate_pixRep->SetPointError(nPoint, 0, ratePixErr);
+      rate_pixRepMod->SetPoint(nPoint, rep, ratePix);
+      rate_pixRepMod->SetPointError(nPoint, 0, ratePixErr);
     }
 
   listStr.close();
@@ -325,14 +337,23 @@ int main(int argc, char* argv[])
       peakRepRoc[iRoc]->Write();
       sigmaRepRoc[iRoc]->Write();
       rate_pixRepRoc[iRoc]->Write();
+      peakDistrRoc[iRoc]->Write();
     }
   delete serv;
+
+  double sumRMS = 0;
+  for(int iRoc = 0; iRoc < nRoc; ++iRoc)
+    {
+      sumRMS += peakDistrRoc[iRoc]->GetRMS();
+    }
+  std::cout << "The mean RMS of the measured line is: " << sumRMS / nRoc << std::endl;
 
   for(int iRoc = 0; iRoc < nRoc; ++iRoc)
     {
       peakRep->Add(peakRepRoc[iRoc]);
       sigmaRep->Add(sigmaRepRoc[iRoc]);
       peakRate_pix->Add(peakRate_pixRoc[iRoc]);
+      rate_pixRep->Add(rate_pixRepRoc[iRoc]);
     }
 
   outFile->cd();
@@ -365,23 +386,10 @@ int main(int argc, char* argv[])
   sigmaRepCan->Update();
   sigmaRepCan->Write();
 
-  TCanvas* entriesRepCan = new TCanvas("entriesRepCan");
-  entriesRepCan->SetGridx();
-  entriesRepCan->SetGridy();
-  entriesRep->SetMarkerStyle(22);
-  entriesRep->SetMarkerSize(2);
-  entriesRep->Draw("AP");
-  entriesRep->GetXaxis()->SetTitle("Repetition");
-  entriesRep->GetYaxis()->SetTitle("Entries");
-  entriesRep->Write();
-  entriesRepCan->Modified();
-  entriesRepCan->Update();
-  entriesRepCan->Write();
-
   TCanvas* peakRatePixCan = new TCanvas("peakRatePixCan");
   peakRatePixCan->SetGridx();
   peakRatePixCan->SetGridy();
-  peakRate_pix->Draw("AP");
+  peakRate_pix->Draw("APL");
   peakRate_pix->GetXaxis()->SetTitle("Rate fired pixels [kHz cm^{-2}]");
   peakRate_pix->GetYaxis()->SetTitle("Measured ionization [Vcal]");
   peakRate_pix->Write();
@@ -391,18 +399,44 @@ int main(int argc, char* argv[])
   peakRatePixCan->Update();
   peakRatePixCan->Write();
 
-  TCanvas* pixRepCan = new TCanvas("pixRepCan");
-  pixRepCan->SetGridx();
-  pixRepCan->SetGridy();
-  rate_pixRep->SetMarkerStyle(22);
-  rate_pixRep->SetMarkerSize(2);
-  rate_pixRep->Draw("AP");
+  TCanvas* ratePixRepCan = new TCanvas("ratePixRepCan");
+  ratePixRepCan->SetGridx();
+  ratePixRepCan->SetGridy();
+  rate_pixRep->Draw("APL");
   rate_pixRep->GetXaxis()->SetTitle("Repetition");
   rate_pixRep->GetYaxis()->SetTitle("Rate fired pixels [kHz cm^{-2}]");
   rate_pixRep->Write();
-  pixRepCan->Modified();
-  pixRepCan->Update();
-  pixRepCan->Write();
+  leg = ratePixRepCan->BuildLegend();
+  leg->SetFillColor(kWhite);
+  ratePixRepCan->Modified();
+  ratePixRepCan->Update();
+  ratePixRepCan->Write();
+
+  TCanvas* entriesRepModCan = new TCanvas("entriesRepModCan");
+  entriesRepModCan->SetGridx();
+  entriesRepModCan->SetGridy();
+  entriesRepMod->SetMarkerStyle(22);
+  entriesRepMod->SetMarkerSize(2);
+  entriesRepMod->Draw("AP");
+  entriesRepMod->GetXaxis()->SetTitle("Repetition");
+  entriesRepMod->GetYaxis()->SetTitle("Entries");
+  entriesRepMod->Write();
+  entriesRepModCan->Modified();
+  entriesRepModCan->Update();
+  entriesRepModCan->Write();
+
+  TCanvas* ratePixRepModCan = new TCanvas("ratePixRepModCan");
+  ratePixRepModCan->SetGridx();
+  ratePixRepModCan->SetGridy();
+  rate_pixRepMod->SetMarkerStyle(22);
+  rate_pixRepMod->SetMarkerSize(2);
+  rate_pixRepMod->Draw("AP");
+  rate_pixRepMod->GetXaxis()->SetTitle("Repetition");
+  rate_pixRepMod->GetYaxis()->SetTitle("Rate fired pixels [kHz cm^{-2}]");
+  rate_pixRepMod->Write();
+  ratePixRepModCan->Modified();
+  ratePixRepModCan->Update();
+  ratePixRepModCan->Write();
 
   // peakDistr->Write();
   // sigmaDistr->Write();
