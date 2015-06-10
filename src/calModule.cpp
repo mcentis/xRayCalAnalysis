@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   TH1* hist;
 
   int nPoint = 0;
-  const double negSigma = 0.5; // fit limits
+  const double negSigma = 0.75; // fit limits
   const double posSigma = 1.5;
 
   double ionization;
@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
     {
       calGr[i]->Draw("AP");
       calGr[i]->GetXaxis()->SetTitle("Measured ionization [Vcal]");
+      calGr[i]->GetXaxis()->SetLimits(0, 180);
       calGr[i]->GetYaxis()->SetTitle("Expected ionization [e^{-}]");
 
       fit = new TF1("fitCal", "pol1", 0, 500);

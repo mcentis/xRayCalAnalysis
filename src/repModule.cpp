@@ -39,6 +39,8 @@ int main(int argc, char* argv[])
   gStyle->SetTitleOffset(0.95, "x");
   gStyle->SetTitleOffset(0.95, "y");
 
+  gStyle->SetMarkerSize(2);
+
   TFile* inFile;
   char fileName[200];
   char title[50];
@@ -65,14 +67,17 @@ int main(int argc, char* argv[])
       if(iColor >= 5) iColor++; // skip yellow
 
       if(iRoc < 8)
-	iMarker = 24; // empty circle
+	//iMarker = 24; // empty circle
+	iMarker = 22;
       else
-	iMarker = 25; // empty square
+	//iMarker = 25; // empty square
+	iMarker = 23;
 
       peakRepRoc[iRoc] = new TGraphErrors();
       sprintf(name, "peakRep_roc_%i", iRoc);
       peakRepRoc[iRoc]->SetName(name);
-      sprintf(title, "%s line, ROC %i", argv[1], iRoc);
+      // sprintf(title, "%s line, ROC %i", argv[1], iRoc);
+      sprintf(title, "ROC %i", iRoc);
       peakRepRoc[iRoc]->SetTitle(title);
       peakRepRoc[iRoc]->SetLineColor(iColor);
       peakRepRoc[iRoc]->SetFillColor(kWhite);
@@ -82,7 +87,8 @@ int main(int argc, char* argv[])
       sigmaRepRoc[iRoc] = new TGraphErrors();
       sprintf(name, "sigmaRep_roc_%i", iRoc);
       sigmaRepRoc[iRoc]->SetName(name);
-      sprintf(title, "#sigma %s line, ROC %i", argv[1], iRoc);
+      // sprintf(title, "#sigma %s line, ROC %i", argv[1], iRoc);
+      sprintf(title, "ROC %i", iRoc);
       sigmaRepRoc[iRoc]->SetTitle(title);
       sigmaRepRoc[iRoc]->SetLineColor(iColor);
       sigmaRepRoc[iRoc]->SetFillColor(kWhite);
@@ -92,7 +98,8 @@ int main(int argc, char* argv[])
       peakRate_pixRoc[iRoc] = new TGraphErrors();
       sprintf(name, "peakRate_pix_roc_%i", iRoc);
       peakRate_pixRoc[iRoc]->SetName(name);
-      sprintf(title, "%s line, ROC %i", argv[1], iRoc);
+      sprintf(title, "ROC %i", iRoc);
+      // sprintf(title, "%s line, ROC %i", argv[1], iRoc);
       peakRate_pixRoc[iRoc]->SetTitle(title);
       peakRate_pixRoc[iRoc]->SetLineColor(iColor);
       peakRate_pixRoc[iRoc]->SetFillColor(kWhite);
@@ -102,7 +109,8 @@ int main(int argc, char* argv[])
       rate_pixRepRoc[iRoc] = new TGraphErrors();
       sprintf(name, "rate_pixRepRoc_%i", iRoc);
       rate_pixRepRoc[iRoc]->SetName(name);
-      sprintf(title, "Pix rate, ROC %i", iRoc);
+      sprintf(title, "ROC %i", iRoc);
+      // sprintf(title, "Pix rate, ROC %i", iRoc);
       rate_pixRepRoc[iRoc]->SetTitle(title);
       rate_pixRepRoc[iRoc]->SetLineColor(iColor);
       rate_pixRepRoc[iRoc]->SetFillColor(kWhite);
